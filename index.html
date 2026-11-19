@@ -797,6 +797,8 @@ id: d.id, ...d.data()
 window.accounts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
 renderAccounts();
+// If a product ID is present in the URL, open its detail after Firebase data loads.
+openProductFromUrl();
 if (window.isAdminLoggedIn) renderAdminAccountList();
 
 if (window.activeAccountDetail) {
@@ -1221,9 +1223,25 @@ if (existingRipple) existingRipple.remove();
 
 card.appendChild(circle);
 
+// Add the product ID to the address bar so this detail can be shared.
+const productUrl = new URL(window.location.href);
+productUrl.searchParams.set('produk', accId);
+history.pushState({ productId: accId }, '', productUrl);
+
 setTimeout(() => {
 openAccountDetail(accId);
 }, 120);
+};
+
+// Resolve a shared product URL after the Firestore account list is available.
+window.openProductFromUrl = () => {
+const productId = new URLSearchParams(window.location.search).get('produk');
+if (!productId) return;
+
+const account = window.accounts.find(item => item.id === productId);
+if (account) {
+openAccountDetail(account.id);
+}
 };
 
 window.openAccountDetail = (accId) => {
@@ -1343,6 +1361,13 @@ window.closeDetailModal = () => {
 closeModal('detailModal');
 if (window.detailCarouselTimer) clearInterval(window.detailCarouselTimer);
 window.activeAccountDetail = null;
+
+// Remove the product ID from the URL when returning to the catalog.
+const productUrl = new URL(window.location.href);
+if (productUrl.searchParams.has('produk')) {
+productUrl.searchParams.delete('produk');
+history.replaceState({}, '', productUrl);
+}
 };
 
 window.handleAdminLogin = (e) => {
@@ -1789,6 +1814,18 @@ toast.classList.remove('translate-y-0', 'opacity-100');
 toast.classList.add('translate-y-20', 'opacity-0');
 }, 3000);
 };
+
+// Keep the detail popup in sync with browser back/forward navigation.
+window.addEventListener('popstate', () => {
+const productId = new URLSearchParams(window.location.search).get('produk');
+if (productId) {
+  if (window.accounts.length) openAccountDetail(productId);
+} else if (window.activeAccountDetail) {
+  closeModal('detailModal');
+  if (window.detailCarouselTimer) clearInterval(window.detailCarouselTimer);
+  window.activeAccountDetail = null;
+}
+});
 
 // START INITIALIZATION ON LOAD
 window.addEventListener('DOMContentLoaded', () => {
