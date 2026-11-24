@@ -1119,7 +1119,7 @@ window.currentCategory = 'Semua';
 window.searchQuery = '';
 window.onlyReadyFilter = false;
 window.isAdminLoggedIn = false;
-window.currentAdminPassword = 'reyzix15esret.22';
+window.currentAdminPassword = 'reynastokepep.22';
 window.activeAccountDetail = null;
 window.currentCarouselIndex = 0;
 window.detailCarouselTimer = null;
@@ -1201,16 +1201,14 @@ updateDetailRatingSummary(window.activeAccountDetail.id);
 console.error("Error loading reviews:", error);
 });
 
-// 4. Listen for Admin Password Doc (Hanya jalan setelah login Google Admin)
-auth.onAuthStateChanged((user) => {
-  if (user && user.email === 'raffakului@gmail.com') {
-    onSnapshot(settingsDoc, (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.data();
-        if (data.password) window.currentAdminPassword = data.password;
-      }
-    });
+// 4. Listen for Admin Password Doc
+onSnapshot(settingsDoc, (snapshot) => {
+  if (snapshot.exists()) {
+    const data = snapshot.data();
+    if (data.password) window.currentAdminPassword = data.password;
   }
+}, (error) => {
+  console.error("Error loading admin settings:", error);
 });
 
 window.renderBanners = () => {
