@@ -574,6 +574,9 @@ Masuk Panel Admin
 <button onclick="switchAdminTab('password')" id="tabPwBtn" class="admin-tab border-b-2 border-transparent text-slate-400 hover:text-white px-3.5 py-2.5 whitespace-nowrap">
 <i class="fa-solid fa-key mr-1"></i> Ubah Password
 </button>
+<button onclick="switchAdminTab('pointLogs')" id="tabPointLogsBtn" class="admin-tab border-b-2 border-transparent text-slate-400 hover:text-white px-3.5 py-2.5 whitespace-nowrap">
+  <i class="fa-solid fa-receipt mr-1"></i> Struk Poin
+</button>
 </div>
 
 <!-- TAB 0: DAFTAR & KELOLA AKUN (ADMIN ONLY) -->
@@ -716,10 +719,123 @@ Gunakan gambar beresolusi jelas agar tampilan tidak pecah.
 </button>
 </form>
 </div>
-</div>
-</div>
-</div>
+<!-- TAB STRUK POIN / MUTASI POIN (ADMIN ONLY) -->
+<div id="adminTabPointLogs" class="hidden space-y-3">
+  <div class="flex items-center justify-between">
+    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider font-rajdhani">
+      Mutasi & Struk Poin
+    </h4>
+    <button onclick="loadPointLogs()" class="text-[11px] text-brand-400 hover:text-brand-300 flex items-center gap-1">
+      <i class="fa-solid fa-rotate-right"></i> Refresh
+    </button>
+  </div>
 
+  <!-- Kolom Pencarian Gmail Pembeli -->
+  <div class="relative">
+    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+    <input 
+      type="text" 
+      id="searchPointLogInput" 
+      oninput="filterPointLogs()" 
+      placeholder="Cari Gmail pembeli..." 
+      class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+    />
+  </div>
+
+  <!-- Daftar Mutasi Berderet ke Bawah (Gaya Mutasi DANA) -->
+  <div id="pointLogsListContainer" class="space-y-2 max-h-96 overflow-y-auto pr-1">
+    <p class="text-center text-xs text-slate-500 py-6">Memuat mutasi poin...</p>
+  </div>
+</div>
+<!-- MODAL DETAIL STRUK POIN (Muncul saat mutasi diklik) -->
+<div id="pointLogDetailModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm p-5 shadow-2xl space-y-4">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div class="flex items-center gap-2">
+        <div id="detailLogIcon" class="w-8 h-8 rounded-full flex items-center justify-center text-sm"></div>
+        <div>
+          <h3 class="text-sm font-bold text-white">Detail Struk Poin</h3>
+          <p class="text-[11px] text-slate-400" id="detailLogType">Transaksi Poin</p>
+        </div>
+      </div>
+      <button onclick="closePointLogDetail()" class="text-slate-400 hover:text-white text-sm">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Nominal Besar di Tengah -->
+    <div class="text-center py-2 bg-slate-950/60 rounded-xl border border-slate-800/80">
+      <p class="text-[11px] text-slate-400 mb-0.5">Nominal Transaksi</p>
+      <p id="detailLogNominal" class="text-xl font-extrabold tracking-wide"></p>
+    </div>
+
+    <!-- Rincian Data -->
+    <div class="space-y-2.5 text-xs">
+      <div class="flex justify-between gap-2">
+        <span class="text-slate-400">Email User</span>
+        <span id="detailLogEmail" class="text-white font-medium text-right break-all"></span>
+      </div>
+      <div class="flex justify-between gap-2">
+        <span class="text-slate-400">Waktu & Tanggal</span>
+        <span id="detailLogDate" class="text-slate-200 text-right"></span>
+      </div>
+      <div class="flex justify-between gap-2 pt-2 border-t border-slate-800">
+        <span class="text-slate-400">Saldo Akhir User</span>
+        <span id="detailLogBalanceAfter" class="text-brand-400 font-bold text-right"></span>
+      </div>
+    </div>
+
+    <button onclick="closePointLogDetail()" class="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold py-2.5 rounded-xl transition">
+      Tutup Struk
+    </button>
+  </div>
+</div>
+</div>
+</div>
+</div>
+<!-- MODAL DETAIL STRUK POIN (Muncul saat mutasi diklik) -->
+<div id="pointLogDetailModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm p-5 shadow-2xl space-y-4">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div class="flex items-center gap-2">
+        <div id="detailLogIcon" class="w-8 h-8 rounded-full flex items-center justify-center text-sm"></div>
+        <div>
+          <h3 class="text-sm font-bold text-white">Detail Struk Poin</h3>
+          <p class="text-[11px] text-slate-400" id="detailLogType">Transaksi Poin</p>
+        </div>
+      </div>
+      <button onclick="closePointLogDetail()" class="text-slate-400 hover:text-white text-sm">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Nominal Besar di Tengah -->
+    <div class="text-center py-2 bg-slate-950/60 rounded-xl border border-slate-800/80">
+      <p class="text-[11px] text-slate-400 mb-0.5">Nominal Transaksi</p>
+      <p id="detailLogNominal" class="text-xl font-extrabold tracking-wide"></p>
+    </div>
+
+    <!-- Rincian Data -->
+    <div class="space-y-2.5 text-xs">
+      <div class="flex justify-between gap-2">
+        <span class="text-slate-400">Email User</span>
+        <span id="detailLogEmail" class="text-white font-medium text-right break-all"></span>
+      </div>
+      <div class="flex justify-between gap-2">
+        <span class="text-slate-400">Waktu & Tanggal</span>
+        <span id="detailLogDate" class="text-slate-200 text-right"></span>
+      </div>
+      <div class="flex justify-between gap-2 pt-2 border-t border-slate-800">
+        <span class="text-slate-400">Saldo Akhir User</span>
+        <span id="detailLogBalanceAfter" class="text-brand-400 font-bold text-right"></span>
+      </div>
+    </div>
+
+    <button onclick="closePointLogDetail()" class="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold py-2.5 rounded-xl transition">
+      Tutup Struk
+    </button>
+  </div>
+</div>
 <!-- TOAST NOTIFICATION -->
 <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 glass-card border border-brand-500 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 max-w-xs">
 <i id="toastIcon" class="fa-solid fa-circle-info text-brand-400 text-lg"></i>
@@ -734,7 +850,9 @@ import {
   getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
 import {
-getFirestore, doc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, deleteField, increment, getDoc
+  getFirestore, doc, setDoc, updateDoc,
+  deleteDoc, onSnapshot, collection
+  , deleteField, increment, getDoc, getDocs, addDoc, query, orderBy, limit
 } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
 // FIREBASE CREDENTIALS (SINKRONISASI ALL-DEVICE REALTIME)
@@ -899,7 +1017,20 @@ window.kirimReyPoinKeUser = async function(e) {
       points: saldoBaru,
       updatedAt: Date.now()
     }, { merge: true });
-
+    // 4. Catat struk mutasi ke koleksi rans_point_logs
+    await addDoc(collection(db, "rans_point_logs"), {
+      email: email,
+      nominal: jumlah,
+      saldoAkhir: saldoBaru,
+      timestamp: Date.now(),
+      waktuString: new Date().toLocaleString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    });
     alert(`Berhasil memproses ${jumlah} Saldo X-nas Poin ke ${email}!\nTotal saldo sekarang: ${saldoBaru} Poin`);
     emailInput.value = "";
     jumlahInput.value = "";
@@ -1651,51 +1782,157 @@ showModal('adminPanelModal');
 };
 
 window.switchAdminTab = (tab) => {
-const tabs = ['list', 'posting', 'banners', 'password'];
-tabs.forEach(t => {
-const tabEl = document.getElementById('adminTab' + t.charAt(0).toUpperCase() + t.slice(1));
-const btnEl = document.getElementById('tab' + (t === 'posting' ? 'Post': t === 'password' ? 'Pw': t === 'banners' ? 'Banner': 'List') + 'Btn');
+  const tabs = ['list', 'posting', 'banners', 'password', 'pointLogs'];
+  tabs.forEach(t => {
+    const tabEl = document.getElementById('adminTab' + t.charAt(0).toUpperCase() + t.slice(1));
+    const btnEl = document.getElementById('tab' + (
+      t === 'posting' ? 'Post' :
+      t === 'password' ? 'Pw' :
+      t === 'banners' ? 'Banner' :
+      t === 'pointLogs' ? 'PointLogs' : 'List'
+    ) + 'Btn');
 
-if (tabEl) tabEl.classList.add('hidden');
-if (btnEl) {
-btnEl.classList.remove('border-brand-500', 'text-brand-400', 'active');
-btnEl.classList.add('border-transparent', 'text-slate-400');
-}
-});
+    if (tabEl) tabEl.classList.add('hidden');
+    if (btnEl) {
+      btnEl.classList.remove('border-brand-500', 'text-brand-400', 'active');
+      btnEl.classList.add('border-transparent', 'text-slate-400');
+    }
+  });
 
-if (tab === 'list') {
-document.getElementById('adminTabList')?.classList.remove('hidden');
-const btn = document.getElementById('tabListBtn');
-if (btn) {
-btn.classList.add('border-brand-500', 'text-brand-400', 'active');
-btn.classList.remove('border-transparent', 'text-slate-400');
-}
-renderAdminAccountList();
-} else if (tab === 'posting') {
-document.getElementById('adminTabPosting')?.classList.remove('hidden');
-const btn = document.getElementById('tabPostBtn');
-if (btn) {
-btn.classList.add('border-brand-500', 'text-brand-400', 'active');
-btn.classList.remove('border-transparent', 'text-slate-400');
-}
-} else if (tab === 'banners') {
-document.getElementById('adminTabBanners')?.classList.remove('hidden');
-const btn = document.getElementById('tabBannerBtn');
-if (btn) {
-btn.classList.add('border-brand-500', 'text-brand-400', 'active');
-btn.classList.remove('border-transparent', 'text-slate-400');
-}
-renderAdminBannerList();
-} else if (tab === 'password') {
-document.getElementById('adminTabPassword')?.classList.remove('hidden');
-const btn = document.getElementById('tabPwBtn');
-if (btn) {
-btn.classList.add('border-brand-500', 'text-brand-400', 'active');
-btn.classList.remove('border-transparent', 'text-slate-400');
-}
-}
+  if (tab === 'list') {
+    document.getElementById('adminTabList')?.classList.remove('hidden');
+    const btn = document.getElementById('tabListBtn');
+    if (btn) {
+      btn.classList.add('border-brand-500', 'text-brand-400', 'active');
+      btn.classList.remove('border-transparent', 'text-slate-400');
+    }
+    renderAdminAccountList();
+  } else if (tab === 'posting') {
+    document.getElementById('adminTabPosting')?.classList.remove('hidden');
+    const btn = document.getElementById('tabPostBtn');
+    if (btn) {
+      btn.classList.add('border-brand-500', 'text-brand-400', 'active');
+      btn.classList.remove('border-transparent', 'text-slate-400');
+    }
+  } else if (tab === 'banners') {
+    document.getElementById('adminTabBanners')?.classList.remove('hidden');
+    const btn = document.getElementById('tabBannerBtn');
+    if (btn) {
+      btn.classList.add('border-brand-500', 'text-brand-400', 'active');
+      btn.classList.remove('border-transparent', 'text-slate-400');
+    }
+    renderAdminBannerList();
+  } else if (tab === 'password') {
+    document.getElementById('adminTabPassword')?.classList.remove('hidden');
+    const btn = document.getElementById('tabPwBtn');
+    if (btn) {
+      btn.classList.add('border-brand-500', 'text-brand-400', 'active');
+      btn.classList.remove('border-transparent', 'text-slate-400');
+    }
+  } else if (tab === 'pointLogs') {
+    document.getElementById('adminTabPointLogs')?.classList.remove('hidden');
+    const btn = document.getElementById('tabPointLogsBtn');
+    if (btn) {
+      btn.classList.add('border-brand-500', 'text-brand-400', 'active');
+      btn.classList.remove('border-transparent', 'text-slate-400');
+    }
+    window.loadPointLogs();
+  }
+};
+let allPointLogsCache = [];
+
+window.loadPointLogs = async () => {
+  const container = document.getElementById('pointLogsListContainer');
+  if (!container) return;
+  container.innerHTML = '<p class="text-center text-xs text-slate-500 py-6">Memuat mutasi poin...</p>';
+
+  try {
+    const q = query(collection(db, "rans_point_logs"), orderBy("timestamp", "desc"), limit(100));
+    const snap = await getDocs(q);
+
+    allPointLogsCache = [];
+    snap.forEach(docSnap => {
+      allPointLogsCache.push({ id: docSnap.id, ...docSnap.data() });
+    });
+
+    window.renderPointLogs(allPointLogsCache);
+  } catch (err) {
+    console.error("Gagal memuat mutasi poin:", err);
+    container.innerHTML = '<p class="text-center text-xs text-red-400 py-6">Gagal memuat data mutasi.</p>';
+  }
 };
 
+window.renderPointLogs = (logs) => {
+  const container = document.getElementById('pointLogsListContainer');
+  if (!container) return;
+
+  if (!logs.length) {
+    container.innerHTML = '<p class="text-center text-xs text-slate-500 py-6">Belum ada riwayat mutasi poin.</p>';
+    return;
+  }
+
+  container.innerHTML = logs.map((log, index) => {
+    const isPlus = Number(log.nominal) >= 0;
+    const formattedNominal = `${isPlus ? '+' : '-'}${Math.abs(Number(log.nominal)).toLocaleString('id-ID')}`;
+    const nominalColor = isPlus ? 'text-emerald-400' : 'text-rose-400';
+    const iconBg = isPlus ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400';
+    const iconClass = isPlus ? 'fa-arrow-down-left' : 'fa-arrow-up-right';
+
+    return `
+      <div onclick="openPointLogDetail(${index})" class="cursor-pointer bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800 rounded-xl p-3 flex items-center justify-between transition">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-full ${iconBg} flex items-center justify-center shrink-0 text-xs">
+            <i class="fa-solid ${iconClass}"></i>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xs font-semibold text-white truncate">${log.email}</p>
+            <p class="text-[10px] text-slate-400 mt-0.5">${log.waktuString || '-'}</p>
+          </div>
+        </div>
+        <div class="text-right shrink-0 ml-2">
+          <p class="text-xs font-bold ${nominalColor}">${formattedNominal}</p>
+          <p class="text-[10px] text-slate-500">Poin</p>
+        </div>
+      </div>
+    `;
+  }).join('');
+};
+
+window.filterPointLogs = () => {
+  const keyword = (document.getElementById('searchPointLogInput')?.value || '').toLowerCase().trim();
+  const filtered = allPointLogsCache.filter(item => (item.email || '').includes(keyword));
+  window.renderPointLogs(filtered);
+};
+
+window.openPointLogDetail = (index) => {
+  const keyword = (document.getElementById('searchPointLogInput')?.value || '').toLowerCase().trim();
+  const list = keyword ? allPointLogsCache.filter(item => (item.email || '').includes(keyword)) : allPointLogsCache;
+  const log = list[index];
+  if (!log) return;
+
+  const isPlus = Number(log.nominal) >= 0;
+  const formattedNominal = `${isPlus ? '+' : '-'}${Math.abs(Number(log.nominal)).toLocaleString('id-ID')} Poin`;
+
+  const iconEl = document.getElementById('detailLogIcon');
+  iconEl.className = `w-8 h-8 rounded-full flex items-center justify-center text-sm ${isPlus ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`;
+  iconEl.innerHTML = `<i class="fa-solid ${isPlus ? 'fa-plus' : 'fa-minus'}"></i>`;
+
+  document.getElementById('detailLogType').textContent = isPlus ? 'Penambahan Poin oleh Admin' : 'Pengurangan Poin oleh Admin';
+
+  const nomEl = document.getElementById('detailLogNominal');
+  nomEl.textContent = formattedNominal;
+  nomEl.className = `text-xl font-extrabold tracking-wide ${isPlus ? 'text-emerald-400' : 'text-rose-400'}`;
+
+  document.getElementById('detailLogEmail').textContent = log.email;
+  document.getElementById('detailLogDate').textContent = log.waktuString || '-';
+  document.getElementById('detailLogBalanceAfter').textContent = `${Number(log.saldoAkhir || 0).toLocaleString('id-ID')} Poin`;
+
+  document.getElementById('pointLogDetailModal')?.classList.remove('hidden');
+};
+
+window.closePointLogDetail = () => {
+  document.getElementById('pointLogDetailModal')?.classList.add('hidden');
+};
 window.resetAccountForm = () => {
 const formAccountId = document.getElementById('formAccountId');
 const formTitle = document.getElementById('formTitle');
